@@ -1,0 +1,124 @@
+import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart'; // Add this import
+
+
+void main() {
+  runApp(MyApp());
+}
+
+class ImageNode {
+  String imagePath;
+  ImageNode? next;
+
+  ImageNode(this.imagePath, {this.next});
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.teal,
+          title: Center(child: Text('click the button bellow!')),
+        ),
+        body: ImageSlider(),
+      ),
+    );
+  }
+}
+
+class ImageSlider extends StatefulWidget {
+  @override
+  _ImageSliderState createState() => _ImageSliderState();
+}
+
+class _ImageSliderState extends State<ImageSlider> {
+  late ImageNode _head;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeList();
+  }
+
+  void _initializeList() {
+    _head = ImageNode('image1.png');
+    _head.next = ImageNode('image2.png');
+    _head.next!.next = ImageNode('image3.png');
+    _head.next!.next!.next = ImageNode('image4.png');
+    _head.next!.next!.next!.next = ImageNode('image5.png');
+  }
+
+  void _reverseList() {
+    ImageNode? prev = null;
+    ImageNode? curr = _head;
+    while (curr != null) {
+      ImageNode? nextNode = curr.next;
+      curr.next = prev;
+      prev = curr;
+
+      curr = nextNode;
+    }
+    _head = prev!;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: FloatingActionButton(
+            onPressed: _reverseList,
+            backgroundColor: Colors.amber,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            child: AutoSizeText(
+              'Reverse',
+              style: TextStyle(fontSize: 14),
+              maxLines: 1,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          ),
+
+          Expanded(
+              child: ListView.builder(
+            itemCount: _getListLength(),
+            itemExtent: 100.0, // Adjust this value as needed
+            itemBuilder: (context, index) {
+              return Image.asset(
+                _getImagePath(index),
+                fit: BoxFit.contain, // Adjust the fit as needed
+              );
+            },
+          )),
+        ],
+      ),
+    );
+  }
+
+  int _getListLength() {
+    int length = 0;
+    ImageNode? current = _head;
+    while (current != null) {
+      length++;
+      current = current.next;
+    }
+    return length;
+  }
+
+  String _getImagePath(int index) {
+    ImageNode? current = _head;
+    for (int i = 0; i < index; i++) {
+      current = current!.next;
+    }
+    return current!.imagePath;
+  }
+}
+
+
+
+
